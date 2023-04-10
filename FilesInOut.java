@@ -1,34 +1,43 @@
-import java.io.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
-import javax.swing.*;
-import java.lang.Number;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 
-/**
- * 
- * CSCU9T4 Java strings and files exercise.
- *
- */
 public class FilesInOut {
 
     public static void main(String[] args) {
-        // Replace this with statements to set the file name (input) and file name (output).
-        // Initially it will be easier to hardcode suitable file names.
-
-        // Set up a new Scanner to read the input file.
-        // Processing line by line would be sensible here.
-        // Initially, echo the text to System.out to check you are reading correctly.
-        // Then add code to modify the text to the output format.
-
-        // Set up a new PrintWriter to write the output file.
-        // Add suitable code into the above processing (because you need to do this line by line also.
-        // That is, read a line, write a line, loop.
-
-        // Finally, add code to read the filenames as arguments from the command line.
-
-        System.out.println("You need to add your own code to do anything");
-
-    } // main
-
-} // FilesInOut
+        if (args.length < 2) {
+            System.out.println("Usage: java FilesInOut inputFile outputFile");
+            return;
+        }
+        String inputFile = args[0];
+        String outputFile = args[1];
+        try (BufferedReader reader = new BufferedReader(new FileReader(inputFile));
+             PrintWriter writer = new PrintWriter(new FileWriter(outputFile))) {
+            boolean newSentence = true;
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] words = line.split("\\s+");
+                StringBuilder sb = new StringBuilder();
+                for (String word : words) {
+                    if (word.isEmpty()) {
+                        continue;
+                    }
+                    char firstChar = word.charAt(0);
+                    if (newSentence && Character.isLowerCase(firstChar)) {
+                        firstChar = Character.toUpperCase(firstChar);
+                    }
+                    sb.append(firstChar).append(word.substring(1)).append(" ");
+                    if (word.matches(".*[.?!]$")) {
+                        newSentence = true;
+                    } else {
+                        newSentence = false;
+                    }
+                }
+                writer.println(sb.toString().trim());
+            }
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
+        }
+    }
+}
